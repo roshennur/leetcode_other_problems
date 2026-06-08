@@ -37,15 +37,19 @@ INSERT INTO events VALUES
 (29, 111, 'sign_up',      '2024-01-07'),
 (30, 112, 'page_visit',   '2024-01-07');
 
-select * from events;
+SELECT * FROM events;
 
-with stage as (
-	select
-		count(distinct case when event_type = 'page_visit' then user_id end) as page_visit_nr,
-		count(distinct case when event_type = 'sign_up' then user_id end) as signup_nr,
-		count(distinct case when event_type = 'add_to_cart' then user_id end) as add_to_cart_nr,
-		count(distinct case when event_type = 'purchase' then user_id end) as purchase_nr
-	from events
+----------------------------------------------------------------------------------------------
+-- REVENUE FUNNEL ANALYSIS
+----------------------------------------------------------------------------------------------
+
+WITH stage AS (
+	SELECT
+		COUNT(DISTINCT CASE WHEN event_type = 'page_visit' THEN user_id END) AS page_visit_nr,
+		COUNT(DISTINCT CASE WHEN event_type = 'sign_up' THEN user_id END) AS signup_nr,
+		COUNT(DISTINCT CASE WHEN event_type = 'add_to_cart' THEN user_id END) AS add_to_cart_nr,
+		COUNT(DISTINCT CASE WHEN event_type = 'purchase' THEN user_id END) AS purchase_nr
+	FROM events
 )
 select 
 	'Page visit' as stage,
@@ -71,7 +75,12 @@ select
 	ROUND(100.0 * purchase_nr / signup_nr, 2)
 from stage;
 
--------------------=
+
+----------------------------------------------------------------------------------------------
+-- REVENUE LEAK
+----------------------------------------------------------------------------------------------
+
+
 with stages as (
 	select
 		count(distinct case when event_type = 'page_visit' then user_id end) as page_visit_nr,
